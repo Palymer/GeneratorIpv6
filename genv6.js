@@ -1,31 +1,32 @@
 const fs = require('fs');
-const randomIpv6 = require('random-ipv6');
 
-let prefix = 64;
-let numAddresses = Math.pow(2, 128 - prefix);
-let needHosts = 50000;
-let mainBlock = '2a01:4f8:242:4d0d';
-let addresses = [];
+const network = '2a07:14c0:0:2451'; // Введите ваш префикс сети тут
+const MAXCOUNT = 5000; // Количество адресов
 
-// Function to replace tokens in mainBlock with random numbers
-function randomAddress() {
-  return randomIpv6(`${mainBlock}:{token}:{token}:{token}:{token}`, {
-    padded: true,
-    tokens:{ 
-        min: 0,
-        max: 65535
-    }
-  });
+const array = ['1','2','3','4','5','6','7','8','9','0','a','b','c','d','e','f'];
+let count = 1;
+
+function rnd_ip_block() {
+    const a = `${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}`;
+    const b = `${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}`;
+    const c = `${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}`;
+    const d = `${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}${array[Math.floor(Math.random() * 16)]}`;
+    return `${network}:${a}:${b}:${c}:${d}`;
 }
 
-for (let i = 0; i < needHosts; i++) {
-  addresses.push(randomAddress());
+
+let writeStream = fs.createWriteStream('ipv6list.txt'); // Записываем полученные айпи в файл
+
+console.log('-----------------');
+
+while (count <= MAXCOUNT) {
+    let ip = rnd_ip_block();
+    writeStream.write(`${ip}\n`);
+    console.log(ip);
+    count++;
 }
 
-const fileName = 'ipv6adresses.txt';
+console.log('-----------------');
 
-fs.writeFile(fileName, addresses.join('\n'), (err) => {
-  if (err) throw err;
-
-  console.log(`File with IPv6 addresses saved to ${fileName}!`);
-});
+console.log(`Создано и записано (${MAXCOUNT} IPv6 адресов) с использованием вашего префикса IPv6:`);
+writeStream.end();
